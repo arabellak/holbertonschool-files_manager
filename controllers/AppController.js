@@ -1,6 +1,6 @@
 //Definition of the endpoints
-import { dbClient } from "../utils/db";
-import { redisClient } from "../utils/redis";
+import dbClient  from "../utils/db";
+import redisClient from '../utils/db'
 
 class AppController {
     //Return if Redis and DB are alive by using
