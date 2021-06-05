@@ -30,13 +30,15 @@ class DBClient {
   // Function that returns the number of documents in the
   // collection users
   async nbUsers() {
-    return this.userCol.countDocuments();
+    const numUsers = this.userCol.countDocuments();
+    return numUsers;
   }
 
   // Function that returns the number of documents in the
   // collection files
   async nbFiles() {
-    return this.filesCol.countDocuments();
+    const numFile = this.filesCol.countDocuments();
+    return numFile;
   }
 }
 const dbClient = new DBClient();
