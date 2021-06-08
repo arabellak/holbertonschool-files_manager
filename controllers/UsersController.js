@@ -1,5 +1,7 @@
 import sha1 from 'sha1';
+import { ObjectId } from 'mongodb';
 import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
 class UsersController {
   static async postNew(req, res) {
@@ -22,6 +24,16 @@ class UsersController {
 
     const newUser = await dbClient.db.collection('users').findOne({ email });
     return res.status(201).send({ id: newUser._id, email });
+  }
+
+  // Should retrieve the user base on the token used
+  static async postMe(req, res) {
+    const tok = req.header('X-Token');
+    const getToken = await redisClient.get(`auth_${tok}`);
+    if (!getToken) return res.status(401).json({ error: 'Unauthorized' });
+
+    const userFind = await dbClient.db.collection('users').findOne({ _id: ObjectId(getToken) });
+    return res.json({ email: userFind.email, id: userFind._id });
   }
 }
 
