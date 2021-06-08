@@ -18,7 +18,6 @@ class UsersController {
     }
 
     const hashpass = sha1(password);
-
     await dbClient.db.collection('users').insertOne({ email, password: hashpass });
 
     const newUser = await dbClient.db.collection('users').findOne({ email });
