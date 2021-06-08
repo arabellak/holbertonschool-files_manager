@@ -1,20 +1,25 @@
+import express from 'express';
 import AppController from '../controllers/AppController';
 import UsersController from '../controllers/UsersController';
-import express from 'express'
 
 const router = express.Router();
 
 // Endpoints
-router.get('/status', (req, res) => {
-  AppController.getStatus(req, res);
-});
+const routeControllers = (app) => {
+  app.use(express.json());
+  app.use(router);
 
-router.get('/stats', (req, res) => {
-  AppController.getStats(req, res);
-});
+  router.get('/status', (req, res) => {
+    AppController.getStatus(req, res);
+  });
 
-router.post('/users', (req, res) => {
-  UsersController.postNew(req, res);
-});
+  router.get('/stats', (req, res) => {
+    AppController.getStats(req, res);
+  });
 
-export default router;
+  router.post('/users', (req, res) => {
+    UsersController.postNew(req, res);
+  });
+};
+
+export default routeControllers;
