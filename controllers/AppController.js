@@ -10,8 +10,8 @@ class AppController {
     res.status(200).send(checker);
   }
 
-  // Return the number of users and files in DB 
-  //with status code 200
+  // Return the number of users and files in DB
+  // with status code 200
   static getStats(req, res) {
     const stat = { users: dbClient.nbUsers(), files: dbClient.nbFiles() };
     res.status(200).send(stat);
