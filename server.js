@@ -1,9 +1,11 @@
-const express = require('express');
+import express from 'express';
+import router from './routes/index'
 
 const app = express();
 
 // All routes from routes directory
-app.use('/', require('./routes/index'));
+app.use(express.json());
+app.use(router)
 
 // Port
 const PORT = process.env.PORT || 5000;

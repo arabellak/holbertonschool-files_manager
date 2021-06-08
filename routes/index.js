@@ -1,7 +1,6 @@
 import AppController from '../controllers/AppController';
 import UsersController from '../controllers/UsersController';
-
-const express = require('express');
+import express from 'express'
 
 const router = express.Router();
 
@@ -18,4 +17,4 @@ router.post('/users', (req, res) => {
   UsersController.postNew(req, res);
 });
 
-module.exports = router;
+export default router;
