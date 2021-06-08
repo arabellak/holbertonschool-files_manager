@@ -23,7 +23,7 @@ At the end of this project, you are expected to be able to explain to anyone, wi
 - How to store temporary data in Redis
 - How to setup and use a background worker
 
-### Author
+### :frowning_woman: Author
 
-- Caroll Hudgson
-- Barbara
+- [Caroll Hudgson](https://github.com/Caroll1889)
+- [Barbara](https://github.com/arabellak)
