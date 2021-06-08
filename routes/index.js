@@ -1,8 +1,8 @@
-const express = require('express');
 import AppController from '../controllers/AppController';
 import UsersController from '../controllers/UsersController';
+const express = require('express');
 
-const router = express();
+const router = express.Router();
 
 //Endpoints
 router.get('/status', function(req, res) {

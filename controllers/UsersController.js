@@ -1,44 +1,27 @@
-import { ObjectId } from 'mongodb';
+import sha1 from 'sha1';
 import dbClient from '../utils/db';
 
-const sha1 = require('sha1');
-
 class UsersController {
-  static postNew(req, res) {
-    try {
-      const { email } = req.body;
-      if (!email) {
-        return res.status(400).send({ error: 'Missing email' });
-      }
-
-      const passwrd = req.body.password;
-      if (!passwrd) {
-        return res.status(400).send({ error: 'Missing password' });
-      }
-
-      const findEmail = dbClient.db.collection('users').findOne({ email });
-      if (findEmail) {
-        return res.status(400).send({ error: 'Already exist' });
-      }
-
-      let userId;
-      const hashpass = sha1(passwrd);
-      const newUser = {
-        email,
-        password: hashpass,
-      };
-
-      try {
-        dbClient.db.collection('users').insertOne(newUser, (error) => {
-          userId = newUser._id;
-          return res.status(201).send({ email, id: userId });
-        });
-      } catch (error) {
-        return res.status(error.status).send({ error });
-      }
-    } catch (err) {
-      return res.status(500).send({ error: 'server not connected' });
+  static async postNew(req, res) {
+    const { email, password } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Missing email' });
     }
+
+    if (!password) {
+      return res.status(400).json({ error: 'Missing password' });
+    }
+
+    const findEmail = await dbClient.db.collection('users').findOne({ email });
+    if (findEmail) {
+      return res.status(400).json({ error: 'Already exist' });
+    }
+
+    const hashpass = sha1(password);
+    await dbClient.db.collection('users').insertOne({ email, password: hashpass });
+
+    const newUser = await dbClient.db.collection('users').findOne({ email });
+    return res.status(201).send({ id: newUser._id, email });
   }
 }
 
