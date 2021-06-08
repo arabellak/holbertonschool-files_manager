@@ -1,14 +1,17 @@
-const express = require('express');
+import express from 'express';
+import routeControllers from './routes/index';
 
 const app = express();
-
-// All routes from routes directory
-app.use('/', require('./routes/index'));
+app.use(express.json());
 
 // Port
 const PORT = process.env.PORT || 5000;
+
+// All routes from routes directory
+routeControllers(app);
+
 app.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}`);
-})
+  console.log(`Server is listening on port ${PORT}`);
+});
 
 export default app;
