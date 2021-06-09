@@ -8,18 +8,21 @@ class AuthController {
   // Should sign-in the user by generating a new authentication token
   static connect(req, res) {
     const autHeader = req.headers('Authorization');
-    if(!autHeader) return res.status(401).json({ error: 'Unauthorized' });
+    if(!autHeader) return res.status(401).json({ error: 'Use Autorization Header' });
 
-    const authorize = Buffer.from(autHeader.split(' ')[1], 'base64').toString().split(':');
-    const [email, password] = authorize
+    // Basic auth(base64), authorization header
+    const authhead = request.header('Authorization').slice(6)
 
+    // create a buffer with authhead token
+    const buffer = Buffer.from(authhead, 'base64')
+    const [email, password] = buffer.toString('utf8').split(':');
+
+    //Find a user in a db collection
     const userEmail = dbClient.db.collection('users').findOne({ email });
     if (!userEmail) return res.status(401).json({ error: 'Unauthorized' });
 
     const hashpass = sha1(password);
     if (!hashpass) return res.status(401).json({ error: 'Unauthorized' });
-
-    if(!user) return res.status(401).json({ error: 'Unauthorized' });
 
     const tok = uuid();
     const key = `auth_${tok}`;
