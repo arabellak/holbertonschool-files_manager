@@ -7,8 +7,9 @@ import redisClient from '../utils/redis';
 class AuthController {
   // Should sign-in the user by generating a new authentication token
   static connect(req, res) {
-    const autHeader = req.headers.authorization;
-    //if(!autHeader) return res.status(401).json({ error: 'Unauthorized' });
+    const autHeader = req.headers('Authorization');
+    if(!autHeader) return res.status(401).json({ error: 'Unauthorized' });
+
     const authorize = Buffer.from(autHeader.split(' ')[1], 'base64').toString().split(':');
     const [email, password] = authorize
 
