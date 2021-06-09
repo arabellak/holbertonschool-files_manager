@@ -1,6 +1,8 @@
 import express from 'express';
 import AppController from '../controllers/AppController';
 import UsersController from '../controllers/UsersController';
+import AuthController from '../controllers/AuthController';
+import FilesController from '../controllers/FilesController';
 
 // Endpoints
 const routeControllers = (app) => {
@@ -21,11 +23,15 @@ const routeControllers = (app) => {
   });
 
   router.get('/connect', (req, res) => {
-    AppController.getConnect(req, res);
+    AuthController.connect(req, res);
   });
 
-  router.get('/disconnet', (req, res) => {
-    AppController.getDisconnect(req, res);
+  router.get('/disconnect', (req, res) => {
+    AuthController.disconnect(req, res);
+  });
+
+  router.post('/files', (req, res) => {
+    FilesController.postUpload(req, res);
   });
 
   router.get('/users/me', (req, res) => {
