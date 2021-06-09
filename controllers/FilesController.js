@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import { v4 as uuid } from 'uuid';
 
 
-class filesController {
+class FilesController {
     static postUpload(req, res) {
       const token = req.header('X-Token');
       if (!token) return res.status(401).send({ error: 'Unauthorized' })
@@ -63,3 +63,5 @@ class filesController {
       
     }
 }
+
+export default FilesController;
