@@ -28,8 +28,8 @@ const routeControllers = (app) => {
     AppController.getDisconnect(req, res);
   });
 
-  router.post('/users/me', (req, res) => {
-    UsersController.postUserMe(req, res);
+  router.get('/users/me', (req, res) => {
+    UsersController.getMe(req, res);
   });
 };
 
