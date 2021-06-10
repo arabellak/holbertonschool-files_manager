@@ -96,6 +96,55 @@ class FilesController {
       parentId: fileDataDb.parentId,
     });
   }
+
+  // Retrieves the file document based on the ID
+  static async getShow(req, res) {
+    // Retrieve the user based on the token
+    const token = req.header('X-Token') || null;
+    if (!token) return res.status(401).send({ error: 'Unauthorized' });
+
+    // Obtain and verify an user in redis
+    const idUser = await redisClient.get(`auth_${token}`);
+    if (!idUser) return res.status(401).send({ error: 'Unauthorized' });
+
+    // Obtain and verify an user in mongo
+    const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(idUser) });
+    if (!user) return res.status(401).send({ error: 'Unauthorized' });
+
+    const idFile = req.params.id;
+
+    const findFile = await dbClient.db.collection('files').findOne({ _id: ObjectId(idFile), userId: user._id });
+    if (!findFile) return res.status(404).send({ error: 'Not found' });
+
+    return res.send({
+      id: findFile._id,
+      userId: findFile.userId,
+      name: findFile.name,
+      type: findFile.type,
+      isPublic: findFile.isPublic,
+      parentId: findFile.parentId,
+    });
+  }
+
+  // Retrieves all users file documents for a specific parentId and with pagination
+  static async getIndex(req, res) {
+    // Retrieve the user based on the token
+    const token = req.header('X-Token') || null;
+    if (!token) return res.status(401).send({ error: 'Unauthorized' });
+
+    // Obtain and verify an user in redis
+    const idUser = await redisClient.get(`auth_${token}`);
+    if (!idUser) return res.status(401).send({ error: 'Unauthorized' });
+
+    // Obtain and verify an user in mongo
+    const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(idUser) });
+    if (!user) return res.status(401).send({ error: 'Unauthorized' });
+
+    const parentId = req.query.parentId || 0;
+    if (!parentId) return [];
+
+    const page = req.query.page || 0;
+  }
 }
 
 export default FilesController;
