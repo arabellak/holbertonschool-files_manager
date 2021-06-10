@@ -4,11 +4,12 @@ import UsersController from '../controllers/UsersController';
 import AuthController from '../controllers/AuthController';
 import FilesController from '../controllers/FilesController';
 
+const router = express.Router();
+
 // Endpoints
 const routeControllers = (app) => {
-  const router = express.Router();
-
-  app.use('/', router);
+  app.use(express.json());
+  app.use(router);
 
   router.get('/status', (req, res) => {
     AppController.getStatus(req, res);
