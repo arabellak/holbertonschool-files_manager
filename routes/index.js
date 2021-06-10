@@ -52,7 +52,7 @@ const routeControllers = (app) => {
     FilesController.putPublish(req, res);
   });
 
-  router.get('/files/:id/publish', (req, res) => {
+  router.get('/files/:id/unpublish', (req, res) => {
     FilesController.putUnpublish(req, res);
   });
 };
