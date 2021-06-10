@@ -1,14 +1,16 @@
-import { ObjectId } from 'mongodb';
 import { v4 as uuid } from 'uuid';
 import fs from 'fs';
 import Bull from 'bull';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
+const { ObjectId } = require('mongodb');
+
 class FilesController {
   static async postUpload(req, res) {
     const fileQueue = new Bull('fileQueue');
-    const token = req.header('X-token');
+
+    const token = req.header('X-Token') || null;
     if (!token) return res.status(401).send({ error: 'Unauthorized' });
 
     // Obtain and verify an user in Redis
@@ -51,7 +53,7 @@ class FilesController {
       parentId: fileParentId,
     };
     if (['folder'].includes(fileType)) {
-      dbClient.db.collection('files').insertOne(fileDb);
+      await dbClient.db.collection('files').insertOne(fileDb);
       return res.status(201).send({
         id: fileDb._id,
         userId: fileDb.userId,
