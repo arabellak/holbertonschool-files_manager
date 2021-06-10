@@ -22,7 +22,7 @@ class AuthController {
     if (!userEmail) return res.status(401).json({ error: 'Unauthorized' });
 
     const hashpass = sha1(password);
-    if (!hashpass) return res.status(401).json({ error: 'Unauthorized' });
+    if (!hashpass !== userEmail.password) return res.status(401).json({ error: 'Unauthorized' });
 
     const tok = uuid();
     const key = `auth_${tok}`;
