@@ -97,9 +97,9 @@ class FilesController {
     });
   }
 
-  //Retrieves the file document based on the ID
+  // Retrieves the file document based on the ID
   static async getShow(req, res) {
-    //Retrieve the user based on the token
+    // Retrieve the user based on the token
     const token = req.header('X-Token') || null;
     if (!token) return res.status(401).send({ error: 'Unauthorized' });
 
@@ -111,12 +111,12 @@ class FilesController {
     const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(idUser) });
     if (!user) return res.status(401).send({ error: 'Unauthorized' });
 
-    const idFile = req.params.id
+    const idFile = req.params.id;
 
     const findFile = await dbClient.db.collection('files').findOne({ _id: ObjectId(idFile), userId: user._id });
-    if(!findFile) return res.status(404).send({ error: 'Not found'})
+    if (!findFile) return res.status(404).send({ error: 'Not found' });
 
-    return response.send({
+    return res.send({
       id: findFile._id,
       userId: findFile.userId,
       name: findFile.name,
@@ -126,9 +126,9 @@ class FilesController {
     });
   }
 
-  //Retrieves all users file documents for a specific parentId and with pagination
+  // Retrieves all users file documents for a specific parentId and with pagination
   static async getIndex(req, res) {
-    //Retrieve the user based on the token
+    // Retrieve the user based on the token
     const token = req.header('X-Token') || null;
     if (!token) return res.status(401).send({ error: 'Unauthorized' });
 
@@ -141,7 +141,7 @@ class FilesController {
     if (!user) return res.status(401).send({ error: 'Unauthorized' });
 
     const parentId = req.query.parentId || 0;
-    if(!parentId) return [];
+    if (!parentId) return [];
 
     const page = req.query.page || 0;
   }
