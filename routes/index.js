@@ -23,11 +23,11 @@ const routeControllers = (app) => {
   });
 
   router.get('/connect', (req, res) => {
-    AuthController.connect(req, res);
+    AuthController.getConnect(req, res);
   });
 
   router.get('/disconnect', (req, res) => {
-    AuthController.disconnect(req, res);
+    AuthController.getDisconnect(req, res);
   });
 
   router.post('/files', (req, res) => {
@@ -38,7 +38,7 @@ const routeControllers = (app) => {
     UsersController.getMe(req, res);
   });
 
-  //File controller
+  // File controller
   router.get('/files/:id', (req, res) => {
     FilesController.getShow(req, res);
   });
