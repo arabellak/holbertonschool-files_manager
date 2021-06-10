@@ -1,12 +1,12 @@
 import { ObjectId } from 'mongodb';
-import redisClient from '../utils/redis';
-import dbClient from '../utils/db';
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from 'uuid';
 import fs from 'fs';
 import Bull from 'bull';
+import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
 class FilesController {
-  static postUpload(req, res) {
+  static async postUpload(req, res) {
     const fileQueue = new Bull('fileQueue');
     const token = req.header('X-token');
     if (!token) return res.status(401).send({ error: 'Unauthorized' });
@@ -34,7 +34,8 @@ class FilesController {
     if (!fileData && ['file', 'image'].includes(fileType)) return res.status(400).send({ error: 'Missing data' });
 
     const filePublic = req.body.isPublic || false;
-    const fileParentId = req.body.parentId || 0;
+    let fileParentId = req.body.parentId || 0;
+    fileParentId = fileParentId === '0' ? 0 : fileParentId;
 
     if (fileParentId !== 0) {
       const parentFile = dbClient.db.collection('files').findOne({ _id: ObjectId(fileParentId) });
@@ -68,12 +69,12 @@ class FilesController {
     const pathFile = `${folderPath}/${localPath}`;
 
     await fs.mkdir(folderPath, { recursive: true }, (error) => {
-      if (error) return response.status(400).send({ error: error.message });
+      if (error) return res.status(400).send({ error: error.message });
       return true;
     });
 
     await fs.writeFile(pathFile, buff, (error) => {
-      if (error) return response.status(400).send({ error: error.message });
+      if (error) return res.status(400).send({ error: error.message });
       return true;
     });
 
@@ -85,7 +86,7 @@ class FilesController {
       fileId: fileDb._id,
     });
 
-    return response.status(201).send({
+    return res.status(201).send({
       id: fileDb._id,
       userId: fileDb.userId,
       name: fileDb.name,
