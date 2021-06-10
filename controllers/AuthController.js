@@ -6,18 +6,18 @@ import redisClient from '../utils/redis';
 
 class AuthController {
   // Should sign-in the user by generating a new authentication token
-  static async connect(req, res) {
+  static async getConnect(req, res) {
     const autHeader = req.headers('Authorization');
-    if(!autHeader) return res.status(401).json({ error: 'Use Autorization Header' });
+    if (!autHeader) return res.status(401).json({ error: 'Use Autorization Header' });
 
     // Basic auth(base64), authorization header
-    const authhead = request.header('Authorization').slice(6)
+    const authhead = req.header('Authorization').slice(6);
 
     // create a buffer with authhead token
-    const buffer = Buffer.from(authhead, 'base64')
+    const buffer = Buffer.from(authhead, 'base64');
     const [email, password] = buffer.toString('utf8').split(':');
 
-    //Find a user in a db collection
+    // Find a user in a db collection
     const userEmail = await dbClient.db.collection('users').findOne({ email });
     if (!userEmail) return res.status(401).json({ error: 'Unauthorized' });
 
@@ -32,7 +32,7 @@ class AuthController {
   }
 
   // Retrieve the user based on the token
-  static async disconnect(req, res) {
+  static async getDisconnect(req, res) {
     const tok = req.headers('X-Token');
     const key = `auth_${tok}`;
 
