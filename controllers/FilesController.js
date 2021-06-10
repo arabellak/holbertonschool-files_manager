@@ -147,66 +147,58 @@ class FilesController {
   }
 
   static async putPublish(req, res) {
-    //Retrieve the user based on the token
     const token = req.header('X-Token') || null;
     if (!token) return res.status(401).send({ error: 'Unauthorized' });
 
-    // Obtain and verify an user in redis
-    const idUser = await redisClient.get(`auth_${token}`);
-    if (!idUser) return res.status(401).send({ error: 'Unauthorized' });
+    const redisToken = await redisClient.get(`auth_${token}`);
+    if (!redisToken) return res.status(401).send({ error: 'Unauthorized' });
 
-    // Obtain and verify an user in mongo
-    const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(idUser) });
+    const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(redisToken) });
     if (!user) return res.status(401).send({ error: 'Unauthorized' });
 
     const idFile = req.params.id || '';
 
-    const findFile = await dbClient.db.collection('files').findOne({ _id: ObjectId(idFile), userId: user._id });
-    if (!findFile) return res.status(404).send({ error: 'Not found' });
+    let fileDocument = await dbClient.db.collection('files').findOne({ _id: ObjectId(idFile), userId: user._id });
+    if (!fileDocument) return res.status(404).send({ error: 'Not found' });
 
-    //Update the value of isPublic to true
-    await dbClient.db.collection('files').update({ _id: ObjectId(idFile)}, { $set: { isPublic: true } });
-    findFile = await dbClient.db.collection('files').findOne({ _id: ObjectId(idFile), userId: user._id });
+    await dbClient.db.collection('files').update({ _id: ObjectId(idFile) }, { $set: { isPublic: true } });
+    fileDocument = await dbClient.db.collection('files').findOne({ _id: ObjectId(idFile), userId: user._id });
 
     return res.send({
-      id: findFile._id,
-      userId: findFile.userId,
-      name: findFile.name,
-      type: findFile.type,
-      isPublic: findFile.isPublic,
-      parentId: findFile.parentId,
+      id: fileDocument._id,
+      userId: fileDocument.userId,
+      name: fileDocument.name,
+      type: fileDocument.type,
+      isPublic: fileDocument.isPublic,
+      parentId: fileDocument.parentId,
     });
   }
 
   static async putUnpublish(req, res) {
-    //Retrieve the user based on the token
     const token = req.header('X-Token') || null;
     if (!token) return res.status(401).send({ error: 'Unauthorized' });
 
-    // Obtain and verify an user in redis
-    const idUser = await redisClient.get(`auth_${token}`);
-    if (!idUser) return res.status(401).send({ error: 'Unauthorized' });
+    const redisToken = await redisClient.get(`auth_${token}`);
+    if (!redisToken) return res.status(401).send({ error: 'Unauthorized' });
 
-    // Obtain and verify an user in mongo
-    const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(idUser) });
+    const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(redisToken) });
     if (!user) return res.status(401).send({ error: 'Unauthorized' });
 
     const idFile = req.params.id || '';
 
-    const findFile = await dbClient.db.collection('files').findOne({ _id: ObjectId(idFile), userId: user._id });
-    if (!findFile) return res.status(404).send({ error: 'Not found' });
+    let fileDocument = await dbClient.db.collection('files').findOne({ _id: ObjectId(idFile), userId: user._id });
+    if (!fileDocument) return res.status(404).send({ error: 'Not found' });
 
-    //Update the value of isPublic to false
-    await dbClient.db.collection('files').update({ _id: ObjectId(idFile), userId: user._id}, { $set: { isPublic: false } });
-    findFile = await dbClient.db.collection('files').findOne({ _id: ObjectId(idFile), userId: user._id });
+    await dbClient.db.collection('files').update({ _id: ObjectId(idFile), userId: user._id }, { $set: { isPublic: false } });
+    fileDocument = await dbClient.db.collection('files').findOne({ _id: ObjectId(idFile), userId: user._id });
 
     return res.send({
-      id: findFile._id,
-      userId: findFile.userId,
-      name: findFile.name,
-      type: findFile.type,
-      isPublic: findFile.isPublic,
-      parentId: findFile.parentId,
+      id: fileDocument._id,
+      userId: fileDocument.userId,
+      name: fileDocument.name,
+      type: fileDocument.type,
+      isPublic: fileDocument.isPublic,
+      parentId: fileDocument.parentId,
     });
   }
 }
