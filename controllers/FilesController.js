@@ -144,6 +144,7 @@ class FilesController {
     if (!parentId) return [];
 
     const page = req.query.page || 0;
+    return page;
   }
 
   static async putPublish(req, res) {
