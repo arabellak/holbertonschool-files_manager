@@ -22,7 +22,7 @@ class UsersController {
 
   // Should retrieve the user base on the token used
   static async getMe(req, res) {
-    const tok = req.header('X-Token');
+    const tok = req.header('X-token');
     const getToken = await redisClient.get(`auth_${tok}`);
     if (!getToken) return res.status(401).json({ error: 'Unauthorized' });
 
