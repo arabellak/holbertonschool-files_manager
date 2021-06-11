@@ -202,6 +202,32 @@ class FilesController {
       parentId: fileDocument.parentId,
     });
   }
+
+  static async getFile(req, res) {
+    const idFile = req.params.id || '';
+
+    let fileDocument = await dbClient.db.collection('files').findOne({ _id: ObjectId(idFile) });
+    if (!fileDocument) return res.status(404).send({ error: 'Not found' });
+
+    const iP = fileDocument.isPublic
+    const type = fileDocument.type
+    const userId = fileDocument.userId
+
+    const owner = false;
+    const user = null;
+
+    const token = req.header('X-Token') || null;
+    if (token) const redisToken = await redisClient.get(`auth_${token}`);
+
+    user = await dbClient.db.collection('users').findOne({ _id: ObjectId(redisToken) });
+    if (user) owner = user._id === userId
+
+    if (!iP && (user != owner)) return res.status(404).send({ error: 'Not found' });
+    
+    if (['folder'].includes(type)) return res.status(400).send({ error: "A folder doesn't have content"});
+
+    if (!fileDocument.localPath) return res.status(404).send({ error: 'Not found'});
+  }
 }
 
 export default FilesController;
