@@ -1,22 +1,30 @@
-// Definition of the endpoints
-import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
+import dbClient from '../utils/db';
 
 class AppController {
   // Return if Redis and DB are alive by using
   // the two utils done previously with status code 200
   static getStatus(req, res) {
-    const redis = redisClient.isAlive();
-    const db = dbClient.isAlive();
-    res.status(200).send({ redis, db });
+    try {
+      const redis = redisClient.isAlive();
+      const db = dbClient.isAlive();
+      res.status(200).send({ redis, db });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  // Return the number of users and files in DB
-  // with status code 200
   static async getStats(req, res) {
-    const users = await dbClient.nbUsers();
-    const files = await dbClient.nbFiles();
-    res.status(200).send({ users, files });
+    // Return the number of users and files in DB
+    // with status code 200
+    try {
+      const users = await dbClient.nbUsers();
+      const files = await dbClient.nbFiles();
+
+      res.status(200).send({ users, files });
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 
