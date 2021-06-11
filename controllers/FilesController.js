@@ -1,9 +1,10 @@
 import { v4 as uuid } from 'uuid';
 import fs from 'fs';
 import Bull from 'bull';
-import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
+const mime = require('mime-types');
 const { ObjectId } = require('mongodb');
 
 class FilesController {
@@ -111,7 +112,7 @@ class FilesController {
     const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(idUser) });
     if (!user) return res.status(401).send({ error: 'Unauthorized' });
 
-    const idFile = req.params.id;
+    const idFile = req.params.id || '';
 
     const findFile = await dbClient.db.collection('files').findOne({ _id: ObjectId(idFile), userId: user._id });
     if (!findFile) return res.status(404).send({ error: 'Not found' });
@@ -205,28 +206,40 @@ class FilesController {
 
   static async getFile(req, res) {
     const idFile = req.params.id || '';
+    const size = req.query.size || 0;
 
-    let fileDocument = await dbClient.db.collection('files').findOne({ _id: ObjectId(idFile) });
+    const fileDocument = await dbClient.db.collection('files').findOne({ _id: ObjectId(idFile) });
     if (!fileDocument) return res.status(404).send({ error: 'Not found' });
 
-    const iP = fileDocument.isPublic
-    const type = fileDocument.type
-    const userId = fileDocument.userId
+    const iP = fileDocument.isPublic;
+    const { type } = fileDocument;
+    const { userId } = fileDocument;
 
-    const owner = false;
-    const user = null;
+    let owner = false;
+    let user = null;
 
     const token = req.header('X-Token') || null;
-    if (token) const redisToken = await redisClient.get(`auth_${token}`);
+    if (token) {
+      const redisToken = await redisClient.get(`auth_${token}`);
+      if (redisToken) {
+        user = await dbClient.db.collection('users').findOne({ _id: ObjectId(redisToken) });
+        if (user) owner = user._id === userId;
+      }
+    }
 
-    user = await dbClient.db.collection('users').findOne({ _id: ObjectId(redisToken) });
-    if (user) owner = user._id === userId
+    if (!iP && !owner) return res.status(404).send({ error: 'Not found' });
+    if (['folder'].includes(type)) return res.status(400).send({ error: "A folder doesn't have content" });
 
-    if (!iP && (user != owner)) return res.status(404).send({ error: 'Not found' });
-    
-    if (['folder'].includes(type)) return res.status(400).send({ error: "A folder doesn't have content"});
+    const realPath = size === 0 ? fileDocument.localPath : `${fileDocument.localPath}_${size}`;
 
-    if (!fileDocument.localPath) return res.status(404).send({ error: 'Not found'});
+    try {
+      const dataFile = fs.readFileSync(realPath);
+      const mimeType = mime.contentType(fileDocument.name);
+      res.setHeader('Content-Type', mimeType);
+      return res.send(dataFile);
+    } catch (error) {
+      return res.status(404).send({ error: 'Not found' });
+    }
   }
 }
 
